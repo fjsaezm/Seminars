@@ -1,0 +1,412 @@
+\documentclass[xcolor=table]{beamer}
+\usetheme[progressbar=frametitle]{metropolis}
+\setbeamercolor{block body}{bg=mDarkTeal!30}
+\setbeamercolor{block title}{bg=mDarkTeal,fg=black!2}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+colorlinks = true,
+linkcolor =.,
+    citecolor = .,
+    urlcolor = blue
+}
+\usepackage{cancel}
+\usepackage{amssymb}
+\usepackage{comment}
+\usepackage{witharrows}
+\usepackage{mathtools}
+\usepackage{multicol}
+
+\input{definitions.tex}
+
+\usepackage{arydshln}
+\usepackage{natbib}
+ 
+
+
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+
+\begin{document}
+
+\title{Ensembles}
+\subtitle{Combining continuous-valued outputs}
+\author[Javier Sáez]{\textbf {Javier Sáez}} % auteur
+\institute[Universidad de Granada]{\textbf {Universidad de Granada}}
+\date{\today}
+
+\begin{frame}
+    \maketitle
+\end{frame}
+
+\begin{frame}{Index}
+    \tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%
+%%%%%% SECTION %%%%%
+%%%%%%%%%%%%%%%%%%%%
+
+    
+\begin{frame}{Notation}
+\begin{itemize}
+    \item \(D_i: \R^n \to [0,1]^c\) is a classifier.
+    \item \(d_{i,j}(x)\) represents the support (estimation of the posterior) that \(D_i\) gives to the hypothesis that \(\bx\) comes from class \(\omega_j\).
+    \item We can build
+    \[
+    DP(\bx) = \begin{pmatrix}
+        d_{1,1}(\bx) & \cdots & d_{1,c}(\bx)\\
+        \vdots & \ddots & \vdots \\
+        d_{L,1}(\bx) & \cdots & d_{L,c}(\bx)
+    \end{pmatrix}.
+    \]
+    \item And calculate a degree of support for class \(\omega_j\):
+    \[
+    \mathbf{\mu}_j(\bx) = \mathbf{\mathcal F}\left(d_{1,j}(\bx),\cdots, d_{L,j}(\bx)\right).
+    \]
+    We label \(\bx\) as the class with the largest support.
+\end{itemize}
+
+\vspace{1cm}
+Book: 
+    \cite{10.5555/2935490}
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%%%%%% SECTION %%%%%
+%%%%%%%%%%%%%%%%%%%%
+
+\section{Generic Formulation}
+\begin{frame}{Simple non-trainable combiners}
+The most common combiners are:
+\begin{itemize}
+    \item  Average (sum)
+    \[
+    \mu_j(\bx) = \frac{1}{L}\sum_{i=1}^L d_{i,j}(\bx)
+    \]
+    \item Max/min/median of the 
+    \[
+    \mu_j(\bx) = \max_i \{d_{i,j}(\bx)\}.
+    \]
+    \item Trimmed mean: sort \(d_{i,j}\) and remove \(K/2\%\) from each side, and then compute \(\mu_j(\bx)\) as the average of the rest.
+    \item Product combiner:
+    \[
+    \mu_j(\bx) = \prod_{i=1}^L d_{i,j}(\bx)
+    \]
+\end{itemize}
+    All these are non trainable.
+\end{frame}
+
+\begin{frame}{Equivalence between Min and Max for 2 classes}
+    \begin{proposition}
+    Let \(a_1,\dots,a_L\) be the outputs for class \(\omega_1\) and \(1-a_1,\dots,1-a_L\) the outputs for class \(\omega_2\), \(a_i\in[0,1]\). Then, the class label assigned to \(\bx\) by the MAX and MIN combination rules is the same.
+    \end{proposition}
+    \pause
+    Assume \(a_1 = \min_i a_i\) and \(a_L = \max_i a_i\). 
+    \begin{itemize}
+        \item Minimum will choose \(\mu_1(\bx) = a_1\) and \(\mu_2(\bx) = 1-a_L\)
+        \item Maximum will choose \(\mu_1(\bx) = a_L\) and \(\mu_2(\bx) = 1-a_1\)
+    \end{itemize}
+    \pause
+Then,
+    \begin{itemize}
+        \item \(a_1 > 1- a_L\ \implies a_L < 1- a_1\) both methods choose \(\omega_1\)
+        \item \(a_1 < 1- a_L \implies a_L < 1- a_1\) both methods choose \(\omega _2\)
+        \item \(a_1 = 1- a_L\) both methods choose randomly
+    \end{itemize}
+\end{frame}
+
+\subsection{Equivalences}
+
+\begin{frame}{Equivalence Between Majority Vote and Median for 2 classes}
+    \begin{proposition}
+    Let \(L\) be an odd natural number. Let \(a_1,\dots,a_L\) be the outputs for class \(\omega_1\) and \(1-a_1,\dots,1-a_L\) the outputs for class \(\omega_2\), \(a_i\in[0,1]\). Then, the class label assigned to \(\bx\) by the Majority Vote and Median combination rules is the same.
+    \end{proposition}
+    \pause
+    Assume \(a_1 = \min_i a_i\) and \(a_L = \max_i a_i\). The median of the outputs for class \(\omega_1\) is \(a_{\frac{L+1}{2}} = m\).
+    \begin{itemize}
+        \item If \(m > 0.5\), the median of the outputs for \(\omega_2\) is \(1- m < 0.5\), so \(\omega_1\) is selected. This means that at least \(\frac{L+1}{2}\) posterior probabilities for \(\omega_1\) were greater than \(0.5\), so the majority vote also assigns \(\omega_1\) to \(\bx\)
+        \item If \(m < 0.5\), then \(1- m > 0.5\) and the median assigns \(\omega_2\), but also \(\frac{L+1}{2}\) posteriors for \(\omega_2\) are greater than \(0.5\), so Majority vote also assigns \(\omega_2\) to \(\bx\)
+    \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%
+%%%%%% SECTION %%%%%
+%%%%%%%%%%%%%%%%%%%%
+
+\section{Generalized Mean Combiner}
+\begin{frame}{Generalized Mean Combiner}
+\begin{definition}
+    The \textbf{generalized mean combiner} assigns to each class \(\omega_j\) the support:
+    \[
+    \mu_j(\bx,\alpha) = \left( \frac{1}{L} \sum_{i=1}^L d_{i,j}(\bx)^\alpha \right)^{\frac{1}{\alpha}}
+    \]
+\end{definition}
+
+\pause
+
+Of course, \(\alpha\) can be trained! 
+
+
+\end{frame}
+
+
+
+
+\begin{frame}{Special cases}
+\begin{itemize}
+\item \(\alpha \to \infty \implies \mu_j(\bx,\alpha)\) is the maximum combiner.\\
+    \pause
+    \only<2>{Let \(d_*\) be the maximum of \(d_{i,j}\) for \(i = 1,\dots,L\).
+    \begin{align*}\lim_{\alpha \to \infty} \log \mu_j(\bx,\alpha) & = \lim_{\alpha \to \infty} \frac{1}{\alpha} \log \frac{\sum_{i=1}^L d_{i,j}^\alpha}{L} \\
+    & = \log d_* +\lim_{\alpha \to \infty} \frac{1}{\alpha} \log \frac{\sum_{i=1}^L \left(\frac{d_{i,j}}{d_*}\right)^\alpha}{L}\\
+    & = \log d_*
+    \end{align*}}
+    \pause
+    
+    \item \(\alpha = 1 \implies \mu_j(\bx,\alpha) = \frac{1}{L} \sum_{i=1}^L d_{i,j}\) is the arithmetic mean.
+    \item \(\alpha \to 0 \implies \mu_j(\bx,\alpha) = \left(\prod_{i=1}^L d_{i,j}\right)^{\frac{1}{L}}\) is the geometric mean.
+    \item \(\alpha = -1 \implies \mu_j(\bx,-1) = \left( \frac{1}{L} \sum_{i=1}^L \frac{1}{d_{i,j}(\bx)} \right)^{-1} \) is the harmonic mean.
+    
+    
+    \item \(\alpha \to -\infty \implies \mu_j(\bx,\alpha)\) is the minimum combiner.\\
+\end{itemize}
+
+\pause
+
+\(\alpha\) can then be understood as the level of \emph{optimism} of the combiner:
+\begin{itemize}
+    \item \(\alpha \to -\infty\) is the most pessimistic, implying that \textbf{all} the classifiers must agree with the choice (minimum combiner).
+    \item \(\alpha \to \infty\) is the most optimistic (maximum combiner), where \textbf{at least one} of the classifiers supports \(\omega_j\).
+\end{itemize} 
+    
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%
+%%%%%% SECTION %%%%%
+%%%%%%%%%%%%%%%%%%%%
+
+\section{Theoretical Comparison of Simple combiners}
+
+\begin{frame}{Scenario}
+
+Let us consider the following scenario:
+
+\begin{itemize}
+    \item There are only two classes \(\Omega = \{\omega_1, \omega_2\}\).
+    \item We assume that \(d_{j,i}(\bx)\) is an estimate of the posterior \(p(\omega_i\mid \bx)\) produced by the classifier \(D_j\) and that, for any \(\bx\),
+    \[
+    d_{j,1}(\bx) + d_{j,2}(\bx) = 1.
+    \]
+    \item We assume without loss of generality that the true posterior probability is
+    \[
+    p(\omega_1 \mid \bx) = p > 0.5,
+    \]
+    so Bayes-optimal class label for \(\bx\) is \(\omega_1\) (and assigning \(\omega_2\) is a classification error).
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}{Assumption}
+    The classifiers commit i.i.d. errors in estimating \(p(\omega_1 \mid \bx)\) such that:
+    \[
+    P_j \equiv d_{j,1}(\bx) = p(\omega_1\mid \bx) + \eta(\bx) = p + \eta(\bx)
+    \]
+    and
+    \[
+    d_{j,2}(\bx) = 1 - p - \eta(\bx),
+    \]
+    where \(\eta(\bx)\) is often:
+    \begin{itemize}
+        \item a Gaussian distribution \(\eta(\bx) \sim \mathcal N (0,\sigma^2)\) or
+        \item a continuous uniform distribution \(\eta(\bx) \sim U([-b,b])\).
+    \end{itemize}
+
+\pause
+    Thus, \(d_{j,i}(\bx)\) are random variables. Using the fusion method \(\mathcal F\), the posterior estimates are:
+    \[
+    \hat P_1 = \mathcal F \left(P_1,\dots, P_L\right), \quad \hat P_2 = \mathcal F \left(1-P_1,\dots, 1-P_L\right)
+    \]
+\end{frame}
+
+
+\begin{frame}{Errors}
+    \begin{itemize}
+        \item For the single classifier, average and median fusion models \(\hat P_1 + \hat P_2 = 1\). Thus, if \(\omega_1\) is the correct label, it is sufficient to have \(\hat P_1 > 0.5\) to label \(\bx\) as \(\omega_1\). The probability of error is then:
+        \[
+        P_e = P(\hat P_1 \leq 0.5) = F_{\hat P_1}(0.5) = \int_0^{0.5}f_{\hat P_1}(y) dy
+        \]
+        \pause
+        \item For the minimum and maximum rules, \(\hat P_1 + \hat P_2 \neq 1\) necessarily. An error occur if \(\hat P_1 \leq \hat P_2\):
+        \[
+        P_e = P(\hat P_1 \leq \hat P_2).
+        \]
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Individual Error}
+
+Using a Gaussian distribution, \(\hat P_1 \sim \mathcal N(p,\sigma^2)\). Denoting by \(\Phi(z)\) to the C.D.F. of the \(\mathcal N(0,1)\), then
+\[
+F(t) = \Phi\left( \frac{t-p}{\sigma}\right).
+\]
+\pause
+Since \(F_{\hat P_1}(t) = F(t)\), \textbf{individual error} of a classifier is:
+\[
+P_e = \Phi\left( \frac{0.5-p}{\sigma}\right).
+\]
+    
+\end{frame}
+
+\begin{frame}{Average combiner error}
+
+Given that \(\hat P_1 = \frac{1}{L}  \sum_{j=1}^L P_j\), since \(P_j\) are normally distributed and independent, then \(\hat P_1 \sim \mathcal N \left(p, \frac{\sigma^2}{L}\right)\). Hence, the probability of error in this case is:
+\[
+P_e = P(\hat P_1 < 0.5) = \Phi \left( \frac{\sqrt{L} (0.5 - p)}{\sigma}\right)
+\]
+    
+\end{frame}
+
+\begin{frame}{Median / Majority vote error}
+    In the median fusion method:
+    \[
+    \hat P_1 = \text{med} \{ P_1,\dots,P_L\} = p + \text{med}\{\eta_1,\dots,\eta_L\} = p + \eta_m. 
+    \]
+    \pause
+    The probability of error is:
+    \[
+    P_e = P(p + \eta_m < 0.5) = P(\eta_m < 0.5 - p) = F_{\eta_m}(0.5 - p)
+    \]
+    \pause
+    From order statistics theory \citep{mood1973introduction}
+    \[
+    F_{\eta_m}(t) = \sum_{j = \frac{L+1}{2}}^L \binom{L}{j} F_\eta(t)^j[1-F_\eta(t)]^{L-j}
+    \]
+\end{frame}
+
+\begin{frame}{Proof \(F_{\eta_m}\)}
+    \begin{theorem}[Theorem 11, page 252 \cite{mood1973introduction}]
+    Let \(Y_1\leq Y_2 \leq \dots \leq Y_n\) represent the order statistics from a c.d.f. \(F\). The marginal c.d.f. of \(Y_\alpha\) is:
+    \[
+    F_{Y_\alpha}(y) =  \sum_{j = \alpha}^n \binom{n}{j} F_\eta(t)^j[1-F_\eta(t)]^{n-j}
+    \]
+    \end{theorem}
+    Proof: For a fixed \(y\), let \(Z_i = I_{(-\infty,y)}(X_i)\). Then \(\sum_{i=1}^n Z_i\) is the number of \(X_i\) that are lesser or equal than \(y\). Note that \(\sum_i Z_i\) follows a binomial distribution with parameters \(n\) and \(F(y)\). Thus,
+    \[
+    F_{Y_\alpha}(y) = P[Y_\alpha \leq y] = P\left[\sum_i Z_i \geq \alpha\right] = \sum_{j = \alpha}^n \binom{n}{j} F_\eta(t)^j[1-F_\eta(t)]^{n-j}
+    \]
+\end{frame}
+
+\begin{frame}{Median / Majority vote error}
+    Using that \(\eta\) follows a Gaussian distribution, the probability of error is:
+    \[
+    P_e =  \sum_{j = \frac{L+1}{2}}^L \binom{L}{j} \Phi\left(\frac{0.5-p}{\sigma}\right)^j \left[1-\Phi\left(\frac{0.5-p}{\sigma}\right)^j\right]^{L-j}
+    \]
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%
+%%%%%% SECTION %%%%%
+%%%%%%%%%%%%%%%%%%%%
+
+\section{Theoretical framework for the product combiner}
+
+\begin{frame}{Assumptions}
+    \begin{itemize}
+        \item We can consider each row of \(DP(\bx)\) as a prior on the set of class labels, and \(d_{i,j}\) as the estimate of \(p(\omega_j \mid \bx, D_i)\).
+        \item Let \(P_{(i)} = (d_{i,1}(\bx),\dots,d_{i,c}(\bx))\).
+        \pause
+        \item \textbf{Hypothesis}: The true values of \(p(\omega_i \mid \bx)\) are the ones most agreed upon the ensemble. 
+        \item We denote the agreed values by \(P_{ens} = (\mu_1(\bx), \dots,\mu_c(\bx))\).
+    \end{itemize}
+    \pause
+    The average KL divergence across the \(L\) members is:
+    \[
+    \text{KL}_{av} = \frac{1}{L} \sum_{i=1}^L \text{KL}(P_{ens} \parallel P_{(i)})
+    \]
+\end{frame}
+
+\begin{frame}{Minimization}
+    \begin{problem}
+    \[
+    \min_{P_{ens}} KL_{av}\quad s.t. \quad \sum_{k=1}^c \mu_k = 1
+    \]
+    \end{problem}
+    \pause
+    We solve it using its Lagrangian:
+    \\
+    \[
+    \mathcal L (\{\mu_i\}_{i=1}^c, \lambda) = KL_{av} + \lambda \left(1 + \sum_{k=1}^c \mu_k\right)
+    \]
+    
+\end{frame}
+
+\begin{frame}{Minimization}
+Recalling that 
+\[
+KL(p \parallel q) = \sum_{x}p(x) \log_2 \left(\frac{p(x)}{q(x)}\right),
+\]
+\pause
+We derivate \(\mathcal L\) w.r.t. each of its parameters to find its minimum:
+\begin{align*}
+\frac{\partial \mathcal L}{\partial \mu_j} & = \frac{\partial}{\partial \mu_j} \left[ KL_{av} + \lambda \left(1 - \sum_{k=1}^c \mu_k\right)\right]\\
+& = \frac{1}{L} \sum_{i=1}^L \frac{\partial}{\partial \mu_j} \left[\sum_{k=1}^c\mu_k \log_2 \left(\frac{\mu_k}{d_{i,k}}\right)\right] - \lambda\\
+& = \frac{1}{L} \sum_{i=1}^L \left(\log_2 \left(\frac{\mu_j}{d_{i,j}}\right) + C\right) - \lambda = 0,
+\end{align*}
+with \(C = \frac{1}{ln(2)}\).
+\end{frame}
+
+\begin{frame}{Minimization}
+    Solving for \(\mu_j\), we obtain:
+    \[
+    \mu_j = 2^{(\lambda - C)} \prod_{i=1}^L (d_{i,j})^{1/L}.
+    \]
+    Using in that expression our problem constraint, we obtain:
+    \[
+    \lambda = C - \log_2 \left(\sum_{k=1}^c \prod_{i=1}^L (d_{i,k})^{1/L}\right),
+    \]
+    \pause
+    which leads to the final expression:
+    \[
+    \mu_j = \frac{\prod_{i=1}^L(d_{i,j})^{1/L}}{\sum_{k=1}^c \prod_{i=1}^L (d_{i,k})^{1/L}}.
+    \]
+    which is \textbf{essentially} the \textbf{product rule}.
+\end{frame}
+
+\begin{frame}{Average combiner}
+
+\begin{itemize}
+    \item Remark: the previous hypothesis was that \(P_{ens}\) (vector of posterior probabilities) are the ones most agreed upon by the ensemble.
+    \pause
+    \item If instead we wrote
+    \[
+    KL (P_{(i)} \parallel P_{ens}),
+    \]
+    and we repeat the process we obtain that \(\mu_j\) is the average combiner.
+    \pause
+    \item The hypothesis in this case is different: \(P_{ens}\) is an unknown prior which needs to be transformed to \(L\) posteriors (one for each of the classifiers in the ensemble).
+    
+\end{itemize}
+    
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%
+%%%%%% SECTION %%%%%
+%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{}
+    \begin{center}
+        Thank you for your attention
+    \end{center}
+\end{frame}
+
+
+
+
+  \begin{frame}[noframenumbering]{Bibliography}
+
+  %\vspace{0.5cm}
+  \bibliographystyle{unsrtnat}
+  \bibliography{bibliography.bib}
+
+  \end{frame}
+\end{document}

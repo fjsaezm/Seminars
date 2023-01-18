@@ -1,0 +1,310 @@
+\documentclass{beamer}
+\usetheme{CambridgeUS}
+
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\hypersetup{
+colorlinks = true,
+linkcolor =.,
+    citecolor = .,
+    urlcolor = blue
+}
+\usepackage{cancel}
+\usepackage{amssymb}
+\usepackage{comment}
+\usepackage{witharrows}
+\usepackage{mathtools}
+
+
+\usepackage{arydshln}
+\usepackage{natbib}
+ 
+% Rest of commands
+\newcommand\bb[1]{\mathbf{#1}}
+\newcommand\bff{\mathbf{f}}
+\newcommand\bu{\mathbf{u}}
+
+
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+
+\begin{document}
+
+\title[Introduction to classifier comparison]{Introduction to classifier comparison }
+\author[Javier Sáez]{\textbf {Javier Sáez}} % auteur
+\institute[Universidad de Granada]{\textbf {Universidad de Granada}}
+\date{\today}
+
+\begin{frame}
+    \maketitle
+\end{frame}
+
+\begin{frame}{Index}
+    \tableofcontents
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%
+%%%%%% SECTION %%%%%
+%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}{Notation}
+\begin{itemize}
+    \item \(D\) is a classifier (may have a sub-index)
+    \item \(E_{i,j}\) refers to the error of the classifier \(i\) in the partition/dataset \(j\).
+\end{itemize}
+
+\vspace{1cm}
+Book: 
+    \cite{10.5555/2935490}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%
+%%%%%% SECTION %%%%%
+%%%%%%%%%%%%%%%%%%%%
+\section{General Guidelines}
+
+\begin{frame}{General Guidelines}
+
+\begin{itemize}
+    \item Choose and fix the procedures in advance.
+    \pause
+    \item Compare modified versions of classifiers with the original one. Try not to compare very different classifiers.
+    \pause
+    \item Make sure that all the information is used by all the classifiers (avoid clever initialisations).
+    \pause
+    \item Do NOT look at test data.
+    \pause
+    \item Give also the complexity of the classifier: training and running times, memory requirements, computational requirements.
+\end{itemize}
+    
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%%%%%% SECTION %%%%%
+%%%%%%%%%%%%%%%%%%%%
+
+\section{Two classifiers - single data set}
+
+\begin{frame}{Two classifiers in one fixed set - McNemar test (Continuity corrected version) \citep{McNemarContinuity}}
+
+    \begin{table}[]
+        \centering
+        \begin{tabular}{c|cc}
+        & \(D_2\) correct & \(D_2\) wrong \\
+        \hline
+            \(D_1\) correct & \(N_{11}\) & \(N_{10}\) \\
+            \(D_1\) wrong & \(N_{01}\) & \(N_{00}\)
+        \end{tabular}
+    \end{table}
+
+\pause
+    \(H_0 \equiv\) there is no difference between the accuracies.
+    \[
+    s = \frac{\left(\lvert N_{01}
+     - N_{10}\rvert - 1\right)^2}{N_{01} + N_{10}} \approx \chi^2(1)
+    \]
+    Given \(\alpha\), if \( s > F^{-1}_{\chi^2(1)}(1- \alpha) \), we reject \(H_0 \implies\) the classifiers have significantly different accuracies.
+\end{frame}
+
+
+
+%%%%%%%%%%%%%%%%%%%%
+%%%%%% SECTION %%%%%
+%%%%%%%%%%%%%%%%%%%%
+
+\section{Two models - single data set}
+
+\begin{frame}{Sources of variation in classifier metrics}
+    \begin{itemize}
+        \item Choice of testing set. Single experiment might lead to not very accurate results
+        \pause
+        \item Choice of training sets (unstable classifiers)
+        \pause
+        \item Randomness of the training algorithm
+        \pause
+        \item Randomly mislabeled objects
+    \end{itemize}
+    \pause
+    \vspace{1cm}
+    Simple suggestion: use multiple training and test sets!
+\end{frame}
+
+\begin{frame}{Two models - single data set \citep{NIPS1999_7d12b66d}}
+
+Using a single dataset it is common to partition it and run experiments multiple times.\\
+
+    {\color{blue} T-test: test whether the means of two populations are different}\\
+    %%%%%%%%%%%
+    \pause
+    {\color{red} Problem: errors in the \(T\) testing partitions are not completely independent (K-fold)}\\
+    %%%%%%%%%%%%
+    \pause
+\[d_j = E_{1,j} - E_{2,j}, \quad \forall j = 1,\dots,T\]\\
+\(H_0 \equiv\) mean of these differences is \(0\).\\
+%%%%%%%%%%%%
+    \pause
+    Std of mean difference:
+    \begin{columns}
+\begin{column}{0.3\textwidth}
+\textbf{"Independent"}\\
+\(\sigma_{d}' = \frac{\sigma_d}{\sqrt{T}}\)
+\end{column}
+\begin{column}{0.3\textwidth} 
+\textbf{One split}\\
+\(\sigma_{d}' = \sigma_d \sqrt{\frac{1}{T} + \frac{N_{\text{testing}}}{N_{\text{Training}}}}\)
+\end{column}
+\begin{column}{0.3\textwidth}
+\textbf{K-fold}\\
+\(
+\sigma_{d}' = \sigma_d \sqrt{\frac{1}{K} + \frac{1}{K-1}}
+\)
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Two models - single data set \citep{NIPS1999_7d12b66d}}
+Algorithm:
+    \begin{enumerate}
+        \item Calculate \(d_j\), and then the mean \(m_d\) and standard deviation \(s_d\) (empirical)
+        \item Calculate the amended standard error \(s_{d}'\) as one of the previous cases
+        \item Calculate the test statistic \(t_d = \frac{m_d}{s_d'}\) and the degrees of freedom \(df = T-1\).
+        \item Calculate the p-value:
+        \begin{itemize}
+            \item Two tailed t-test: \(p = 2 F_t(-\abs{t_d}, df)\)
+            \item Set \(H_1 \equiv\) "\(D_1\) has lower error than \(D_2\)", one tailed test, \(p = F_t(t_d, df)\)
+        \end{itemize}
+        \item Reject \(H_0\) if \(p < \alpha\)
+    \end{enumerate}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%
+%%%%%% SECTION %%%%%
+%%%%%%%%%%%%%%%%%%%%
+
+\section{Two classifier models and Multiple Data Sets}
+
+
+\begin{frame}{Two models - multiple datasets: Wilcoxon signed rank test}
+
+T-test not appropiate: errors in different dataset are hardly commensurable.\\
+
+Let \(d_j =E_{1,j} - E_{2,j}, \ \forall j = 1,\dots,N \) be the difference of the errors in the \(N\) datasets.\\
+\begin{itemize}
+    \item \(H_0 \equiv\) the components of the vector \(\mathbf{d} = (d_1,\dots,d_N)\) come from a continuous, symmetric distribution with zero median. 
+\item \(H_1 \equiv\) the distribution does not have zero median.
+\end{itemize}
+
+\vspace{1cm}
+\href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.wilcoxon.html}{Scipy implementation}
+\end{frame}
+
+
+\begin{frame}{Wilcoxon signed rank test}
+    \begin{enumerate}
+        \item Rank the absolute values of the distances \(\abs{d_i}\) in \textbf{increasing order}
+        \item If positions \(j,\dots,j+k\) are tied, the rank of \textbf{all} of them becomes the mean of the ranks. Each dataset will have a rank \(r_i\).
+        \item Split ranks into positive and negative depending on the sign of \(d_i\), and calculate the sums:
+        \[
+R^+ = \sum_{d_i > 0} r_i + \frac{1}{2} \sum_{d_i=0}r_i, \quad R^- = \sum_{d_i < 0} r_i + \frac{1}{2} \sum_{d_i=0}r_i
+        \]
+        \item Take as the test statistic \(T = \min(R^+,R^-)\)
+    \end{enumerate}
+
+        \pause
+
+        Check the value of the statistic in a \emph{Wilcoxon} table. It is special due to the discrete nature of the Binomial distribution.
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%
+%%%%%% SECTION %%%%%
+%%%%%%%%%%%%%%%%%%%%
+
+\section{Multiple Classifier Models and Multiple Data Sets}
+\begin{frame}{Multiple models - multiple datasets: Friedman test }
+
+Consider that we have \(N\) datasets and \(M\) classifiers. Algorithmically, the test can be summarized as:
+\begin{enumerate}
+    \item Rank the classifiers in each of the \(N\) datasets. Ties are shared equally as in the previous test. Let \(r_i^j\) be the rank of classifier \(j\) on the dataset \(i\).
+    %%%
+    \pause
+    \item Fixing \(j\) (a classifier), we calculate \(R_j = \frac{1}{N} \sum_{i=1}^N R_i^j\), the average rank of model \(j\), for each \(j\).
+    %%%
+    \pause
+    \item Calculate the test statistic:
+    \[
+    T = \frac{12N}{M(M+1)} \left( \sum_{j=1}^M R_j^2 - \frac{M(M+1)^2}{4}\right) \sim \chi^2(M-1).
+    \]
+    %%%
+\end{enumerate}
+
+    \pause
+    \(H_0 \equiv\) all classifier models are equivalent.\\
+
+    \href{https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.friedmanchisquare.html}{Scipy Implementation}
+
+
+    
+\end{frame}
+
+
+\begin{frame}{Iman and Davenport amendment}
+    Iman showed \citep{Iman1980} that the previous test has shown to be very conservative in many cases and proposed the following statistic:
+    \[
+    F_F = \frac{(N-1)x_F^2}{N(M-1)-x_F^2} \sim F\left((M-1), (M-1)(N-1)\right)
+    \]
+\end{frame}
+
+\begin{frame}{Post-hoc test}
+\emph{\(H_0\) rejected. Where are the differences?}\\
+
+Two classifiers are declared different if their average ranks differ by more than a critical value.\\
+
+\pause
+
+
+\[
+z = \frac{R_i - R_j}{\sqrt{\frac{M(M+1)}{6N}}}, \quad \forall i,j = 1, \dots, M
+\]
+\pause
+This statistic follows a standard Gaussian distribution.
+\begin{itemize}
+    \item If we compare with all other classifiers, 
+    \[
+     p\text{-value}< \frac{2\alpha}{M(M-1)}
+    \]
+    \item If we compare one classifier with all other:
+    \[
+    p\text{-value}< \frac{\alpha}{M-1}
+    \]
+\end{itemize}
+
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%
+%%%%%% SECTION %%%%%
+%%%%%%%%%%%%%%%%%%%%
+
+\section*{}
+
+\begin{frame}{}
+    \begin{center}
+        Thank you for your attention
+    \end{center}
+\end{frame}
+
+
+
+
+  \begin{frame}[noframenumbering]{Bibliography}
+
+  %\vspace{0.5cm}
+  \bibliographystyle{unsrtnat}
+  \bibliography{bibliography.bib}
+
+  \end{frame}
+\end{document}
