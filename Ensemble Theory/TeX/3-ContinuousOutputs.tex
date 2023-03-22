@@ -33,16 +33,21 @@ linkcolor =.,
 \title{Ensembles}
 \subtitle{Combining continuous-valued outputs}
 \author[Javier Sáez]{\textbf {Javier Sáez}} % auteur
-\institute[Universidad de Granada]{\textbf {Universidad de Granada}}
+\institute[University of Granada]{\textbf {University of Granada}\\
+Visual Information Processing Group}
 \date{\today}
 
-\begin{frame}
-    \maketitle
+
+
+{\setbeamertemplate{footline}{}
+\begin{frame}[noframenumbering]
+\titlepage
 \end{frame}
 
-\begin{frame}{Index}
-    \tableofcontents
-\end{frame}
+
+\begin{frame}[noframenumbering]{Index}
+\tableofcontents
+\end{frame}}
 
 %%%%%%%%%%%%%%%%%%%%
 %%%%%% SECTION %%%%%
@@ -92,46 +97,27 @@ The most common combiners are:
     \mu_j(\bx) = \max_i \{d_{i,j}(\bx)\}.
     \]
     \item Trimmed mean: sort \(d_{i,j}\) and remove \(K/2\%\) from each side, and then compute \(\mu_j(\bx)\) as the average of the rest.
-    \item Product combiner:
+    \item Product combiner/ geometric mean:
     \[
-    \mu_j(\bx) = \prod_{i=1}^L d_{i,j}(\bx)
+    \mu_j(\bx) = \left(\prod_{i=1}^L d_{i,j}(\bx)\right)^{1/L}
     \]
 \end{itemize}
     All these are non trainable.
 \end{frame}
 
-\begin{frame}{Equivalence between Min and Max for 2 classes}
-    \begin{proposition}
+\subsection{Equivalences}
+
+
+\begin{frame}{Equivalences}
+\begin{proposition}
     Let \(a_1,\dots,a_L\) be the outputs for class \(\omega_1\) and \(1-a_1,\dots,1-a_L\) the outputs for class \(\omega_2\), \(a_i\in[0,1]\). Then, the class label assigned to \(\bx\) by the MAX and MIN combination rules is the same.
     \end{proposition}
     \pause
-    Assume \(a_1 = \min_i a_i\) and \(a_L = \max_i a_i\). 
-    \begin{itemize}
-        \item Minimum will choose \(\mu_1(\bx) = a_1\) and \(\mu_2(\bx) = 1-a_L\)
-        \item Maximum will choose \(\mu_1(\bx) = a_L\) and \(\mu_2(\bx) = 1-a_1\)
-    \end{itemize}
-    \pause
-Then,
-    \begin{itemize}
-        \item \(a_1 > 1- a_L\ \implies a_L < 1- a_1\) both methods choose \(\omega_1\)
-        \item \(a_1 < 1- a_L \implies a_L < 1- a_1\) both methods choose \(\omega _2\)
-        \item \(a_1 = 1- a_L\) both methods choose randomly
-    \end{itemize}
-\end{frame}
-
-\subsection{Equivalences}
-
-\begin{frame}{Equivalence Between Majority Vote and Median for 2 classes}
-    \begin{proposition}
+        \begin{proposition}
     Let \(L\) be an odd natural number. Let \(a_1,\dots,a_L\) be the outputs for class \(\omega_1\) and \(1-a_1,\dots,1-a_L\) the outputs for class \(\omega_2\), \(a_i\in[0,1]\). Then, the class label assigned to \(\bx\) by the Majority Vote and Median combination rules is the same.
     \end{proposition}
-    \pause
-    Assume \(a_1 = \min_i a_i\) and \(a_L = \max_i a_i\). The median of the outputs for class \(\omega_1\) is \(a_{\frac{L+1}{2}} = m\).
-    \begin{itemize}
-        \item If \(m > 0.5\), the median of the outputs for \(\omega_2\) is \(1- m < 0.5\), so \(\omega_1\) is selected. This means that at least \(\frac{L+1}{2}\) posterior probabilities for \(\omega_1\) were greater than \(0.5\), so the majority vote also assigns \(\omega_1\) to \(\bx\)
-        \item If \(m < 0.5\), then \(1- m > 0.5\) and the median assigns \(\omega_2\), but also \(\frac{L+1}{2}\) posteriors for \(\omega_2\) are greater than \(0.5\), so Majority vote also assigns \(\omega_2\) to \(\bx\)
-    \end{itemize}
 \end{frame}
+
 %%%%%%%%%%%%%%%%%%%%
 %%%%%% SECTION %%%%%
 %%%%%%%%%%%%%%%%%%%%
@@ -168,7 +154,7 @@ Of course, \(\alpha\) can be trained!
     
     \item \(\alpha = 1 \implies \mu_j(\bx,\alpha) = \frac{1}{L} \sum_{i=1}^L d_{i,j}\) is the arithmetic mean.
     \item \(\alpha \to 0 \implies \mu_j(\bx,\alpha) = \left(\prod_{i=1}^L d_{i,j}\right)^{\frac{1}{L}}\) is the geometric mean.
-    \item \(\alpha = -1 \implies \mu_j(\bx,-1) = \left( \frac{1}{L} \sum_{i=1}^L \frac{1}{d_{i,j}(\bx)} \right)^{-1} \) is the harmonic mean.
+    \item \(\alpha = -1 \implies \mu_j(\bx,\alpha) = \left( \frac{1}{L} \sum_{i=1}^L \frac{1}{d_{i,j}(\bx)} \right)^{-1} \) is the harmonic mean.
     
     
     \item \(\alpha \to -\infty \implies \mu_j(\bx,\alpha)\) is the minimum combiner.\\
@@ -176,7 +162,7 @@ Of course, \(\alpha\) can be trained!
 
 \pause
 
-\(\alpha\) can then be understood as the level of \emph{optimism} of the combiner:
+\(\alpha\) can then be understood as the level of \emph{optimism} of the \textbf{combiner}:
 \begin{itemize}
     \item \(\alpha \to -\infty\) is the most pessimistic, implying that \textbf{all} the classifiers must agree with the choice (minimum combiner).
     \item \(\alpha \to \infty\) is the most optimistic (maximum combiner), where \textbf{at least one} of the classifiers supports \(\omega_j\).
@@ -233,12 +219,13 @@ Let us consider the following scenario:
 
 \begin{frame}{Errors}
     \begin{itemize}
-        \item For the single classifier, average and median fusion models \(\hat P_1 + \hat P_2 = 1\). Thus, if \(\omega_1\) is the correct label, it is sufficient to have \(\hat P_1 > 0.5\) to label \(\bx\) as \(\omega_1\). The probability of error is then:
+        \item For the single classifier, average and median fusion models \(\hat P_1 + \hat P_2 = 1\). Thus, if \(\omega_1\) is the correct label, it is sufficient to have \(\hat P_1 > 0.5\) to label \(\bx\) as \(\omega_1\).\\
+        The probability of error is then:
         \[
         P_e = P(\hat P_1 \leq 0.5) = F_{\hat P_1}(0.5) = \int_0^{0.5}f_{\hat P_1}(y) dy
         \]
         \pause
-        \item For the minimum and maximum rules, \(\hat P_1 + \hat P_2 \neq 1\) necessarily. An error occur if \(\hat P_1 \leq \hat P_2\):
+        \item For the minimum and maximum rules, \(\hat P_1 + \hat P_2 \neq 1\) necessarily. An error occurs if \(\hat P_1 \leq \hat P_2\):
         \[
         P_e = P(\hat P_1 \leq \hat P_2).
         \]
@@ -286,18 +273,6 @@ P_e = P(\hat P_1 < 0.5) = \Phi \left( \frac{\sqrt{L} (0.5 - p)}{\sigma}\right)
     \]
 \end{frame}
 
-\begin{frame}{Proof \(F_{\eta_m}\)}
-    \begin{theorem}[Theorem 11, page 252 \cite{mood1973introduction}]
-    Let \(Y_1\leq Y_2 \leq \dots \leq Y_n\) represent the order statistics from a c.d.f. \(F\). The marginal c.d.f. of \(Y_\alpha\) is:
-    \[
-    F_{Y_\alpha}(y) =  \sum_{j = \alpha}^n \binom{n}{j} F_\eta(t)^j[1-F_\eta(t)]^{n-j}
-    \]
-    \end{theorem}
-    Proof: For a fixed \(y\), let \(Z_i = I_{(-\infty,y)}(X_i)\). Then \(\sum_{i=1}^n Z_i\) is the number of \(X_i\) that are lesser or equal than \(y\). Note that \(\sum_i Z_i\) follows a binomial distribution with parameters \(n\) and \(F(y)\). Thus,
-    \[
-    F_{Y_\alpha}(y) = P[Y_\alpha \leq y] = P\left[\sum_i Z_i \geq \alpha\right] = \sum_{j = \alpha}^n \binom{n}{j} F_\eta(t)^j[1-F_\eta(t)]^{n-j}
-    \]
-\end{frame}
 
 \begin{frame}{Median / Majority vote error}
     Using that \(\eta\) follows a Gaussian distribution, the probability of error is:
@@ -305,19 +280,30 @@ P_e = P(\hat P_1 < 0.5) = \Phi \left( \frac{\sqrt{L} (0.5 - p)}{\sigma}\right)
     P_e =  \sum_{j = \frac{L+1}{2}}^L \binom{L}{j} \Phi\left(\frac{0.5-p}{\sigma}\right)^j \left[1-\Phi\left(\frac{0.5-p}{\sigma}\right)^j\right]^{L-j}
     \]
 \end{frame}
+
+\begin{frame}{Visual Comparison}
+    \begin{figure}
+        \centering
+        \includegraphics[scale=0.22]{Presentations/Images/error_surface.png}
+        \caption{Theoretical of the Majority Vote and Average ensembles.}
+    \end{figure}
+\end{frame}
 %%%%%%%%%%%%%%%%%%%%
 %%%%%% SECTION %%%%%
 %%%%%%%%%%%%%%%%%%%%
 
 \section{Theoretical framework for the product combiner}
 
-\begin{frame}{Assumptions}
+\begin{frame}{Scenario}
     \begin{itemize}
-        \item We can consider each row of \(DP(\bx)\) as a prior on the set of class labels, and \(d_{i,j}\) as the estimate of \(p(\omega_j \mid \bx, D_i)\).
-        \item Let \(P_{(i)} = (d_{i,1}(\bx),\dots,d_{i,c}(\bx))\).
+
+        \item Since \(d_{i,j}\) is an estimate of  \(p(\omega_j \mid \bx, D_i)\), each classifier \(D_i\) produces a probability distribution on the set of classes \(\Omega\). We name this distribution \(P_{(i)} = (d_{i,1}(\bx),\dots,d_{i,c}(\bx))\).
         \pause
-        \item \textbf{Hypothesis}: The true values of \(p(\omega_i \mid \bx)\) are the ones most agreed upon the ensemble. 
-        \item We denote the agreed values by \(P_{ens} = (\mu_1(\bx), \dots,\mu_c(\bx))\).
+        \item Also, the combiner produces a probability distribution \(P_{ens} = (\mu_1(\bx), \dots,\mu_c(\bx))\).
+        \pause
+        \item We would like our combiner to agree with the decisions of the classifiers, that is, we would like the probability distributions to be similar.
+        \pause
+        \item The KL-divergence measures the similarity between probability distributions
     \end{itemize}
     \pause
     The average KL divergence across the \(L\) members is:
@@ -370,22 +356,18 @@ with \(C = \frac{1}{ln(2)}\).
     \[
     \mu_j = \frac{\prod_{i=1}^L(d_{i,j})^{1/L}}{\sum_{k=1}^c \prod_{i=1}^L (d_{i,k})^{1/L}}.
     \]
-    which is \textbf{essentially} the \textbf{product rule}.
+    which is the normalized \textbf{geometric mean}.
 \end{frame}
 
 \begin{frame}{Average combiner}
 
 \begin{itemize}
-    \item Remark: the previous hypothesis was that \(P_{ens}\) (vector of posterior probabilities) are the ones most agreed upon by the ensemble.
-    \pause
+    \item KL-divergence is not symmetric!
     \item If instead we wrote
     \[
     KL (P_{(i)} \parallel P_{ens}),
     \]
     and we repeat the process we obtain that \(\mu_j\) is the average combiner.
-    \pause
-    \item The hypothesis in this case is different: \(P_{ens}\) is an unknown prior which needs to be transformed to \(L\) posteriors (one for each of the classifiers in the ensemble).
-    
 \end{itemize}
     
 \end{frame}
@@ -409,4 +391,52 @@ with \(C = \frac{1}{ln(2)}\).
   \bibliography{bibliography.bib}
 
   \end{frame}
+
+  \section*{Appendix}
+
+  \begin{frame}{Equivalence between Min and Max for 2 classes}
+    \begin{proposition}
+    Let \(a_1,\dots,a_L\) be the outputs for class \(\omega_1\) and \(1-a_1,\dots,1-a_L\) the outputs for class \(\omega_2\), \(a_i\in[0,1]\). Then, the class label assigned to \(\bx\) by the MAX and MIN combination rules is the same.
+    \end{proposition}
+    \pause
+    Assume \(a_1 = \min_i a_i\) and \(a_L = \max_i a_i\). 
+    \begin{itemize}
+        \item Minimum will choose \(\mu_1(\bx) = a_1\) and \(\mu_2(\bx) = 1-a_L\)
+        \item Maximum will choose \(\mu_1(\bx) = a_L\) and \(\mu_2(\bx) = 1-a_1\)
+    \end{itemize}
+    \pause
+Then,
+    \begin{itemize}
+        \item \(a_1 > 1- a_L\ \implies a_L < 1- a_1\) both methods choose \(\omega_1\)
+        \item \(a_1 < 1- a_L \implies a_L < 1- a_1\) both methods choose \(\omega _2\)
+        \item \(a_1 = 1- a_L\) both methods choose randomly
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Equivalence Between Majority Vote and Median for 2 classes}
+    \begin{proposition}
+    Let \(L\) be an odd natural number. Let \(a_1,\dots,a_L\) be the outputs for class \(\omega_1\) and \(1-a_1,\dots,1-a_L\) the outputs for class \(\omega_2\), \(a_i\in[0,1]\). Then, the class label assigned to \(\bx\) by the Majority Vote and Median combination rules is the same.
+    \end{proposition}
+    \pause
+    Assume \(a_1 = \min_i a_i\) and \(a_L = \max_i a_i\). The median of the outputs for class \(\omega_1\) is \(a_{\frac{L+1}{2}} = m\).
+    \begin{itemize}
+        \item If \(m > 0.5\), the median of the outputs for \(\omega_2\) is \(1- m < 0.5\), so \(\omega_1\) is selected. This means that at least \(\frac{L+1}{2}\) posterior probabilities for \(\omega_1\) were greater than \(0.5\), so the majority vote also assigns \(\omega_1\) to \(\bx\)
+        \item If \(m < 0.5\), then \(1- m > 0.5\) and the median assigns \(\omega_2\), but also \(\frac{L+1}{2}\) posteriors for \(\omega_2\) are greater than \(0.5\), so Majority vote also assigns \(\omega_2\) to \(\bx\)
+    \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Proof \(F_{\eta_m}\)}
+    \begin{theorem}[Theorem 11, page 252 \cite{mood1973introduction}]
+    Let \(Y_1\leq Y_2 \leq \dots \leq Y_n\) represent the order statistics from a c.d.f. \(F\). The marginal c.d.f. of \(Y_\alpha\) is:
+    \[
+    F_{Y_\alpha}(y) =  \sum_{j = \alpha}^n \binom{n}{j} F_\eta(t)^j[1-F_\eta(t)]^{n-j}
+    \]
+    \end{theorem}
+    Proof: For a fixed \(y\), let \(Z_i = I_{(-\infty,y)}(X_i)\). Then \(\sum_{i=1}^n Z_i\) is the number of \(X_i\) that are lesser or equal than \(y\). Note that \(\sum_i Z_i\) follows a binomial distribution with parameters \(n\) and \(F(y)\). Thus,
+    \[
+    F_{Y_\alpha}(y) = P[Y_\alpha \leq y] = P\left[\sum_i Z_i \geq \alpha\right] = \sum_{j = \alpha}^n \binom{n}{j} F_\eta(t)^j[1-F_\eta(t)]^{n-j}
+    \]
+\end{frame}
 \end{document}
