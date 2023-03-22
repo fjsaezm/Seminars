@@ -8,3 +8,7 @@ List of currently available seminars:
 1. Introduction to classifier comparison
 2. Combining label outputs
 3. Theoretical study of continuous output basic ensembles
+
+## Uncertainty Estimation:
+
+1. Spectral Normalized Gaussian Processes: Two versions of the presentation can be found. In the reduced one, only the intuitions and the results are presented.

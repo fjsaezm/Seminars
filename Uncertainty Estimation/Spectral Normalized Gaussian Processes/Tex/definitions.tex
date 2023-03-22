@@ -1,0 +1,182 @@
+%21-JUN-2016
+
+
+% Example definitions.
+% --------------------
+
+% Specific definitions
+\def\Xtr{\mathbf{X}_{\text{tr}}}
+\def\Ztr{\mathbf{Z}_{\text{tr}}}
+
+% Packages
+\usepackage{bm}
+\usepackage{color}
+\usepackage{amssymb}
+
+%\usepackage{cite}
+%\usepackage[pdftex]{graphicx}
+\usepackage{algorithm,algorithmic}
+\usepackage{amsmath}
+\usepackage{url}
+\usepackage{float}
+\usepackage{cancel}
+
+\usepackage{multirow}
+
+% Functions
+\def\trace{\operatorname{Tr}}
+\def\KL{\mathbf{KL}}
+\def\PG{\operatorname{PG}}
+\newcommand{\E}{\mathbb{E}}
+
+% Number Sets
+\def\R{{\mathbb R}}
+\def\Z{{\mathbb Z}}
+\def\N{{\mathbb N}}
+
+% Text
+\def\p{{\mathrm{p}}}
+\def\q{{\mathrm{q}}}
+\def\rd{{\mathrm{d}}}
+
+\def\F{{\mathrm{F}}}
+\def\G{{\mathrm{G}}}
+\def\H{{\mathrm{H}}}
+\def\T{{\mathrm{T}}}
+
+\def\KL{{\mbox{KL}}}
+\def\TV{{\mbox{TV}}}
+
+\def\tr{{\text{tr}}}
+
+% Cal
+\def\cC{{\mathcal C}}
+\def\cH{{\mathcal H}}
+\def\cL{{\mathcal L}}
+\def\cN{{\mathcal N}}
+\def\cX{{\mathcal X}}
+
+% Bold Symbols and numbers
+\def\bzero{{\mathbf 0}}
+\def\bone{{\mathbf 1}}
+
+% Greek letters
+\def\balpha{{\boldsymbol{\alpha}}}
+\def\bbeta{{\boldsymbol{\beta}}}
+\def\bgamma{{\boldsymbol{\gamma}}}
+\def\bdelta{{\boldsymbol{\delta}}}
+\def\bepsilon{{\boldsymbol{\epsilon}}}
+\def\bheta{{\boldsymbol{\eta}}}
+\def\btheta{{\boldsymbol{\theta}}}
+\def\biota{{\boldsymbol{\iota}}}
+\def\bkappa{{\boldsymbol{\kappa}}}
+\def\blambda{{\boldsymbol{\lambda}}}
+\def\bmu{{\boldsymbol{\mu}}}
+\def\bnu{{\boldsymbol{\nu}}}
+\def\bxi{{\boldsymbol{\xi}}}
+\def\bpi{{\boldsymbol{\pi}}}
+\def\brho{{\boldsymbol{\rho}}}
+\def\bsigma{{\boldsymbol{\sigma}}}
+\def\btau{{\boldsymbol{\tau}}}
+\def\bups{{\boldsymbol{\upsilon}}}
+\def\bphi{{\boldsymbol{\phi}}}
+\def\bchi{{\boldsymbol{\chi}}}
+\def\bpsi{{\boldsymbol{\psi}}}
+\def\bomega{{\boldsymbol{\omega}}}
+
+\def\bAlpha{{\boldsymbol{\Alpha}}}
+\def\bBeta{{\boldsymbol{\Beta}}}
+\def\bGamma{{\boldsymbol{\Gamma}}}
+\def\bDelta{{\boldsymbol{\Delta}}}
+\def\bEpsilon{{\boldsymbol{\Epsilon}}}
+\def\bHeta{{\boldsymbol{\Eta}}}
+\def\bTheta{{\boldsymbol{\Theta}}}
+\def\bIota{{\boldsymbol{\Iota}}}
+\def\bKappa{{\boldsymbol{\Kappa}}}
+\def\bLambda{{\boldsymbol{\Lambda}}}
+\def\bMu{{\boldsymbol{\Mu}}}
+\def\bNu{{\boldsymbol{\Nu}}}
+\def\bXi{{\boldsymbol{\Xi}}}
+\def\bPi{{\boldsymbol{\Pi}}}
+\def\bRho{{\boldsymbol{\Rho}}}
+\def\bSigma{{\boldsymbol{\Sigma}}}
+\def\bTau{{\boldsymbol{\Tau}}}
+\def\bUps{{\boldsymbol{\Upsilon}}}
+\def\bPhi{{\boldsymbol{\Phi}}}
+\def\bChi{{\boldsymbol{\Chi}}}
+\def\bPsi{{\boldsymbol{\Psi}}}
+\def\bOmega{{\boldsymbol{\Omega}}}
+
+% Bold
+\def\ba{{\mathbf a}}
+\def\bb{{\mathbf b}}
+\def\bc{{\mathbf c}}
+\def\bd{{\mathbf d}}
+\def\be{{\mathbf e}}
+\def\bff{{\mathbf f}}
+\def\bg{{\mathbf g}}
+\def\bh{{\mathbf h}}
+\def\bi{{\mathbf i}}
+\def\bj{{\mathbf j}}
+\def\bk{{\mathbf k}}
+\def\bl{{\mathbf l}}
+\def\bm{{\mathbf m}}
+\def\bn{{\mathbf n}}
+\def\bo{{\mathbf o}}
+\def\bp{{\mathbf p}}
+\def\bq{{\mathbf q}}
+\def\br{{\mathbf r}}
+\def\bs{{\mathbf s}}
+\def\bt{{\mathbf t}}
+\def\bu{{\mathbf u}}
+\def\bv{{\mathbf v}}
+\def\bw{{\mathbf w}}
+\def\bx{{\mathbf x}}
+\def\by{{\mathbf y}}
+\def\bz{{\mathbf z}}
+
+\def\bA{{\mathbf A}}
+\def\bB{{\mathbf B}}
+\def\bC{{\mathbf C}}
+\def\bD{{\mathbf D}}
+\def\bE{{\mathbf E}}
+\def\bF{{\mathbf F}}
+\def\bG{{\mathbf G}}
+\def\bH{{\mathbf H}}
+\def\bI{{\mathbf I}}
+\def\bJ{{\mathbf J}}
+\def\bK{{\mathbf K}}
+\def\bL{{\mathbf L}}
+\def\bM{{\mathbf M}}
+\def\bN{{\mathbf N}}
+\def\bO{{\mathbf O}}
+\def\bP{{\mathbf P}}
+\def\bQ{{\mathbf Q}}
+\def\bR{{\mathbf R}}
+\def\bS{{\mathbf S}}
+\def\bT{{\mathbf T}}
+\def\bU{{\mathbf U}}
+\def\bV{{\mathbf V}}
+\def\bW{{\mathbf W}}
+\def\bX{{\mathbf X}}
+\def\bY{{\mathbf Y}}
+\def\bZ{{\mathbf Z}}
+
+% Commands
+%--------------------
+\newcommand{\mean}[1]{\mathrm{<}#1\mathrm{>}}
+
+
+%\newcommand{\d}{{\mathrm d}}
+\DeclareMathOperator*{\diag}{diag}
+
+
+% Theorems
+
+\usepackage{amsthm}
+\theoremstyle{definition}
+
+
+\newtheorem{proposition}[]{Proposition}
+\newtheorem{nnote}[]{Note}
+%\newtheorem{problem}[]{Problem}
